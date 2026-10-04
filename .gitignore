@@ -1,0 +1,31 @@
+# Build output
+[Bb]in/
+[Oo]bj/
+[Dd]ist/
+dist-ssr/
+node_modules/
+*.tsbuildinfo
+
+# Local secrets and machine config
+.env
+.env.*
+!.env.example
+appsettings.*.local.json
+appsettings.Local.json
+secrets.json
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# IDE and agent-local files
+.vs/
+.idea/
+.cursor/
+*.swp
+
+# Logs and OS files
+*.log
+logs/
+.DS_Store
+Thumbs.db

@@ -1,0 +1,8 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/Ehr.Api/Ehr.Api.csproj" />
+    <Project Path="src/Ehr.Application/Ehr.Application.csproj" />
+    <Project Path="src/Ehr.Domain/Ehr.Domain.csproj" />
+    <Project Path="src/Ehr.Infrastructure/Ehr.Infrastructure.csproj" />
+  </Folder>
+</Solution>

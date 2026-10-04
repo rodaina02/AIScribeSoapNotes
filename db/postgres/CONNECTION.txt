@@ -1,0 +1,32 @@
+EHR + PostgreSQL — connection and schema (Step 4)
+
+1) Configuration keys
+- appsettings.json ships with ConnectionStrings:DefaultConnection for database "ehr_db" and Password=YOUR_PASSWORD. OpenAI:ApiKey is empty. Put real values in user secrets or environment variables. Never commit them.
+- ASP.NET Core maps environment variables with double underscore: set ConnectionStrings__DefaultConnection to override without editing files.
+- For local dev, this solution uses the User secrets ID in Ehr.Api.csproj. After `dotnet user-secrets init` (if needed), set:
+  dotnet user-secrets set "ConnectionStrings:DefaultConnection" "Host=localhost;Port=5432;Database=ehr_db;Username=postgres;Password=YOUR_DEV_PASSWORD"
+- In Azure / containers, prefer a secret store (Key Vault, etc.) and inject the same key at runtime.
+
+2) PostgreSQL: create the database and load schema + dev seed (recommended)
+- One-time: CREATE DATABASE ehr_db;
+- Full reset (drops and recreates **everything** in the public schema, then runs DDL + dev seed):
+  psql -U postgres -d ehr_db -f db/postgres/ehr_db_reset_and_seed.sql
+- The script refuses to run unless you are connected to a database named exactly ehr_db (safety guard).
+- Schema maintenance: edit **db/postgres/ehr_db.sql** (schema-only), then regenerate the combined file with:
+  python db/postgres/_build_reset_script.py
+- **seed_dev_sample.sql** is deprecated; seeding is in ehr_db_reset_and_seed.sql.
+
+3) Option A — Schema from SQL only (no EF migrations on that database)
+- Apply ehr_db_reset_and_seed.sql (or ehr_db.sql for DDL-only without a full wipe), then run the app with a connection string pointed at the same database.
+- EF Core is still used for data access; avoid running `database update` with migrations that would recreate tables unless you have aligned migration history.
+
+4) Option B — EF Core migrations
+- From repo root, install the global tool if needed: dotnet tool install --global dotnet-ef
+- Add a migration: dotnet ef migrations add Initial --project src/Ehr.Infrastructure --startup-project src/Ehr.Api
+- Apply: dotnet ef database update --project src/Ehr.Infrastructure --startup-project src/Ehr.Api
+- The design-time factory (EhrDbContextFactory) reads the environment variable ConnectionStrings__DefaultConnection, or a localhost placeholder with Password=CHANGE_ME for CLI if unset.
+- Migrations table is public.__ef_migrations_history (see DependencyInjection and factory).
+
+5) Npgsql connection string (example shape)
+- Host=localhost;Port=5432;Database=ehr_db;Username=postgres;Password=CHANGE_ME
+- You may add SSL, pooling, and timeout parameters per your deployment.

@@ -1,0 +1,13 @@
+@Ehr.Api_HostAddress = http://localhost:5010
+@TenantId = a0000000-0000-0000-0000-000000000001
+@PatientId = a0000000-0000-0000-0000-000000000003
+
+### Health
+GET {{Ehr.Api_HostAddress}}/health
+
+### Patients for the documentation screen
+GET {{Ehr.Api_HostAddress}}/api/patients
+
+### Visit history for one patient
+GET {{Ehr.Api_HostAddress}}/api/patients/{{PatientId}}/visits
+X-Tenant-Id: {{TenantId}}
